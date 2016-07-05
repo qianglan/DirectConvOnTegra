@@ -4,15 +4,7 @@
 #include <time.h>
 #include "list.h"
 
-#include <sys/time.h>
-inline double timing(){
-        double time;
-        struct timeval timmer;
 
-        gettimeofday(&timmer,NULL);
-        time = timmer.tv_sec*1e3 + timmer.tv_usec*1e-3;        
-        return time;
-}
 
 #define SECRET_NUM -1234
 

@@ -32,6 +32,16 @@ extern "C" {
 #include "blas.h"
 
 #include "gemm.h"
+
+#include <sys/time.h>
+inline double timing(){
+        double time;
+        struct timeval timmer;
+
+        gettimeofday(&timmer,NULL);
+        time = timmer.tv_sec*1e3 + timmer.tv_usec*1e-3;        
+        return time;
+}
 }
 
 float * get_network_output_gpu_layer(network net, int i);
