@@ -156,7 +156,12 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
     dataP = cuda_make_array(NULL, lcc*lhh*lww);
     padding_ongpu(state.input, lcc, lhh, lww, pad, dataP);
 //printf("out_h is %i\n",out_h);
+
+	double start = timing();
     convolutional_ongpu(lhh,lww,m,out_h,out_w,lcc,kernel,a,dataP,l.stride,c);
+    double convtime = timing()-start;
+    double Ops = 2m*out_h*out_w*lcc*kernel*kernel/1e6;
+    printf("|----convolution operations time is %f ms,performance is %f GFLOPS\n",convtime,Ops/convtime);
     //cuda_free(dataP);
 
 //*/
