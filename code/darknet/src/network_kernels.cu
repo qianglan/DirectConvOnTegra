@@ -77,67 +77,67 @@ void forward_network_gpu(network net, network_state state)
 	time_start = timing();
            // forward_convolutional_layer_gpu(l, state);
 	    forward_convolutional_layer_gpu(l, state,i);
-	printf("convolutional_layer_gpu is %f ms.%i.\n",sec(timing()-time_start),i);
+	printf("convolutional_layer_gpu is %f ms.%i.\n",(timing()-time_start),i);
         } else if(l.type == DECONVOLUTIONAL){
 	time_start = timing();
             forward_deconvolutional_layer_gpu(l, state);
-	printf("forward_deconvolutional_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_deconvolutional_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == ACTIVE){
 	time_start = timing(); 
             forward_activation_layer_gpu(l, state);
-	printf("forward_activation_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_activation_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == LOCAL){
 	time = timing(); 
             forward_local_layer_gpu(l, state);
-	printf("forward_activation_layer_gpu is %f ms.\n",sec(timing()-time));
+	printf("forward_activation_layer_gpu is %f ms.\n",(timing()-time));
         } else if(l.type == DETECTION){
 	time_start = timing(); 
             forward_detection_layer_gpu(l, state);
-	printf("forward_detection_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_detection_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == CONNECTED){
 	time_start = timing();
             forward_connected_layer_gpu(l, state);
-	printf("forward_connected_layer_gpu is %f ms.%i.\n",sec(timing()-time_start),i);
+	printf("forward_connected_layer_gpu is %f ms.%i.\n",(timing()-time_start),i);
         } else if(l.type == CROP){
 	time_start = timing();
             forward_crop_layer_gpu(l, state);
-	printf("forward_crop_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_crop_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == COST){
 	time_start = timing();
             forward_cost_layer_gpu(l, state);
-	printf("forward_cost_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_cost_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == SOFTMAX){
 	time_start = timing();
             forward_softmax_layer_gpu(l, state);
-	printf("forward_softmax_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_softmax_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == NORMALIZATION){
 	time_start = timing();
             forward_normalization_layer_gpu(l, state);
-	printf("forward_normalization_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_normalization_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == MAXPOOL){
 	time_start = timing();
             forward_maxpool_layer_gpu(l, state);
-	printf("forward_maxpool_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_maxpool_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == AVGPOOL){
 	time_start = timing();
             forward_avgpool_layer_gpu(l, state);
-	printf("forward_avgpool_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_avgpool_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == DROPOUT){
 	time_start = timing();
             forward_dropout_layer_gpu(l, state);
-	printf("forward_activation_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_activation_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == ROUTE){
 	time_start = timing();
             forward_route_layer_gpu(l, net);
-	printf("forward_route_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_route_layer_gpu is %f ms.\n",(timing()-time_start));
         } else if(l.type == SHORTCUT){
 	time_start = timing();
             forward_shortcut_layer_gpu(l, state);
-	printf("forward_shortcut_layer_gpu is %f ms.\n",sec(timing()-time_start));
+	printf("forward_shortcut_layer_gpu is %f ms.\n",(timing()-time_start));
         }
         state.input = l.output_gpu;
     }
-	printf("tiem1 is %f ms.\n",sec(timing()-time1_start));
+	printf("tiem1 is %f ms.\n",(timing()-time1_start));
 }
 
 void backward_network_gpu(network net, network_state state)
