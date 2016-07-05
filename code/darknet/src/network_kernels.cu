@@ -58,6 +58,7 @@ void forward_network_gpu(network net, network_state state)
 	clock_t time;
 	clock_t time1;
 	double time1_start = timing();
+	double time_start;
     int i;
     for(i = 0; i < net.n; ++i){
         state.index = i;
@@ -73,7 +74,7 @@ void forward_network_gpu(network net, network_state state)
 		printf("convolutional_layer_gpu is %f seconds.\n",sec(clock()-time));
 	}
 */
-	double time_start = timing();
+	time_start = timing();
            // forward_convolutional_layer_gpu(l, state);
 	    forward_convolutional_layer_gpu(l, state,i);
 	printf("convolutional_layer_gpu is %f ms.%i.\n",sec(timing()-time_start),i);
