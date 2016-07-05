@@ -39,7 +39,7 @@ inline double timing(){
         struct timeval timmer;
 
         gettimeofday(&timmer,NULL);
-        time = timmer.tv_sec + timmer.tv_usec*1e-6;        
+        time = timmer.tv_sec*1e3 + timmer.tv_usec*1e-3;        
         return time;
 }
 
