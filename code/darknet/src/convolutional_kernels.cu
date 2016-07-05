@@ -160,7 +160,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
 	double start = timing();
     convolutional_ongpu(lhh,lww,m,out_h,out_w,lcc,kernel,a,dataP,l.stride,c);
     double convtime = timing()-start;
-    double Ops = 2m*out_h*out_w*lcc*kernel*kernel/1e6;
+    double Ops = 2m*out_h*out_w*lcc*kernel*kernel/1000000;
     printf("|----convolution operations time is %f ms,performance is %f GFLOPS\n",convtime,Ops/convtime);
     //cuda_free(dataP);
 
