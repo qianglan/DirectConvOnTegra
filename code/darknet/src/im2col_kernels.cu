@@ -140,6 +140,7 @@ void  padding_ongpu(float *input, int lcc, int lhh, int lww, int pad, float *dat
     int blockpergrids = 1;
     int threadsperblock = 1;
     padding_ongpu_kernel<<<blockpergrids,threadsperblock>>>(input, lcc, lhh, lww, pad, dataP);
+    cudaDeviceSynchronize();
 }
 
 void convolutional_ongpu(int lhh,int lww,int m,int out_h,int out_w,int lcc,int kernel,float *a,float *dataP,int stride,float *c){
@@ -148,6 +149,7 @@ void convolutional_ongpu(int lhh,int lww,int m,int out_h,int out_w,int lcc,int k
     int threadsperblock = out_h;
     convolutional_ongpu_kernel<<<blockpergrids,threadsperblock>>>(lhh,lww,m,out_h,out_w,lcc,kernel,a,dataP,stride,c);
     //cuda_pull_array(float *x_gpu, float *x, int n)
+    cudaDeviceSynchronize();
 
 }
 
