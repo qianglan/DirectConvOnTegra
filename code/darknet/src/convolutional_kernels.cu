@@ -137,7 +137,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
     	int out_w = convolutional_out_width(l);
     	int lcc = l.c;
     	int kernel = l.size;
-    	Ops = 2*m*out_h*out_w*lcc*kernel*kernel/1000000000;
+    	Ops = ((unsigned long long) (2*m*out_h*out_w*lcc*kernel*kernel))/1000000;
     	cudaDeviceSynchronize();
 		double start = timing();
 		int item;
@@ -145,7 +145,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
         	gemm_ongpu(0,0,m,n,k,1.,a,k,b,n,1.,c+i*m*n,n);
         cudaDeviceSynchronize();
         double convtime = (timing()-start)/1000;
-        printf("|----convolution operations time is %f ms,performance is %f GFLOPS for %dX%d * %dX%d \n",convtime*1000,(Ops/convtime)*1000, l.n,l.size*l.size*l.c,l.size*l.size*l.c,out_h*out_w);
+        printf("|----convolution operations time is %f ms,performance is %f GFLOPS for %dX%d * %dX%d \n",convtime*1000,(Ops/convtime), l.n,l.size*l.size*l.c,l.size*l.size*l.c,out_h*out_w);
 	 // printf("absdsdfasdfasdfasdfasf\n");
     }
 
