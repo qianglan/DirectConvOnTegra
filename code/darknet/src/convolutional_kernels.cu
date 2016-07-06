@@ -138,8 +138,9 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
     	int lcc = l.c;
     	int kernel = l.size;
     	Ops = 2*m*out_h*out_w*lcc*kernel*kernel/1000000;
+    	cudaDeviceSynchronize();
 		double start = timing();
-	    cudaDeviceSynchronize();
+	    
         gemm_ongpu(0,0,m,n,k,1.,a,k,b,n,1.,c+i*m*n,n);
         cudaDeviceSynchronize();
         double convtime = timing()-start;
