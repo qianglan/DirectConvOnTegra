@@ -144,7 +144,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
         gemm_ongpu(0,0,m,n,k,1.,a,k,b,n,1.,c+i*m*n,n);
         cudaDeviceSynchronize();
         double convtime = timing()-start;
-        printf("|----convolution operations time is %f ms,performance is %f GFLOPS\n",convtime,Ops/convtime);
+        printf("|----convolution operations time is %f ms,performance is %f GFLOPS for %dX%d * %dX%d \n",convtime,Ops/convtime, l.n,l.size*l.size*l.c,l.size*l.size*l.c,out_h*out_w);
 	 // printf("absdsdfasdfasdfasdfasf\n");
     }
 
