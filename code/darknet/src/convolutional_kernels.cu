@@ -173,7 +173,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
     convolutional_ongpu(lhh,lww,m,out_h,out_w,lcc,kernel,a,dataP,l.stride,c);
     double convtime = timing()-start;
     printf("|----convolution operations time is %f ms,performance is %f GFLOPS\n",convtime,Ops/convtime);
-    cuda_free(dataP);
+    //cuda_free(dataP);
 
 //*/
 //}
