@@ -137,7 +137,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
     	int out_w = convolutional_out_width(l);
     	int lcc = l.c;
     	int kernel = l.size;
-    	Ops = long long(2*m*out_h*out_w*lcc*kernel*kernel)/1000000000;
+    	Ops = 2*m*out_h*out_w*lcc*kernel*kernel/1000000000;
     	cudaDeviceSynchronize();
 		double start = timing();
 		int item;
