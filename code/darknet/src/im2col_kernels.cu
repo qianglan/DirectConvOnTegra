@@ -156,6 +156,7 @@ void forward_connected_layer_ongpu(const int M,const int N,const int K,const flo
     int blockpergrids = 1;
     int threadsperblock = 1;
     gemm_ongpu_kernel<<<blockpergrids,threadsperblock>>>(M,N,K,a,b,c);
+    cudaDeviceSynchronize();
 }
 
 
