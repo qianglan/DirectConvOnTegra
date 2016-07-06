@@ -116,7 +116,7 @@ void forward_convolutional_layer_gpu(convolutional_layer l, network_state state,
         convolutional_out_width(l);
 	int m = l.n;
 fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
-/*
+
 
 //if(ln == 1||ln == 3||ln == 5||ln == 6||ln == 7){
 //if(ln == 1){
@@ -131,15 +131,27 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
         float * a = l.filters_gpu;
         float * b = l.col_image_gpu;
         float * c = l.output_gpu;
+        
+        double Ops;
+        int out_h = convolutional_out_height(l);
+    	int out_w = convolutional_out_width(l);
+    	int lcc = l.c;
+    	int kernel = l.size;
+    	Ops = 2*m*out_h*out_w*lcc*kernel*kernel/1000000;
+		double start = timing();
+	
         gemm_ongpu(0,0,m,n,k,1.,a,k,b,n,1.,c+i*m*n,n);
+        
+        double convtime = timing()-start;
+        printf("|----convolution operations time is %f ms,performance is %f GFLOPS\n",convtime,Ops/convtime);
 	 // printf("absdsdfasdfasdfasdfasf\n");
     }
 
 //}
-*/
+
 
 //else{
-///*
+/*
 //added by fanghao
     float *a = l.filters_gpu;
     float *c = l.output_gpu;
@@ -175,7 +187,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
     printf("|----convolution operations time is %f ms,performance is %f GFLOPS\n",convtime,Ops/convtime);
     //cuda_free(dataP);
 
-//*/
+*/
 //}
 
 

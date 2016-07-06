@@ -188,6 +188,7 @@ void im2col_ongpu(float *im,
                 num_kernels, im, height, width, ksize, pad,
                 stride, height_col,
                 width_col, data_col);
+    cudaDeviceSynchronize();
 }
 
 
