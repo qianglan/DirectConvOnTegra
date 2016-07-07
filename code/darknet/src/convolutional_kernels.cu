@@ -120,7 +120,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
 
 //if(ln == 1||ln == 3||ln == 5||ln == 6||ln == 7){
 //if(ln == 1){
-    int i;
+/*    int i;
     //int m = l.n;
     int k = l.size*l.size*l.c;
     //int n = convolutional_out_height(l)*convolutional_out_width(l);
@@ -137,7 +137,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
     	int out_w = convolutional_out_width(l);
     	int lcc = l.c;
     	int kernel = l.size;
-    	Ops = ((unsigned long long) (2*m*out_h*out_w*lcc*kernel*kernel))/1000000;
+    	Ops = 2*m*out_h*out_w*(((double)(lcc*kernel*kernel))/1000000.0);
     	cudaDeviceSynchronize();
 		double start = timing();
 		int item;
@@ -148,12 +148,12 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
         printf("|----convolution operations time is %f ms,performance is %f GFLOPS for %dX%d * %dX%d \n",convtime*1000,(Ops/convtime), l.n,l.size*l.size*l.c,l.size*l.size*l.c,out_h*out_w);
 	 // printf("absdsdfasdfasdfasdfasf\n");
     }
-
+*/
 //}
 
 
 //else{
-/*
+
 //added by fanghao
     float *a = l.filters_gpu;
     float *c = l.output_gpu;
@@ -182,14 +182,20 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
 //printf("out_h is %i\n",out_h);
 
     double Ops;
-    Ops = 2*m*out_h*out_w*lcc*kernel*kernel/1000000;
-	double start = timing();
-    convolutional_ongpu(lhh,lww,m,out_h,out_w,lcc,kernel,a,dataP,l.stride,c);
-    double convtime = timing()-start;
-    printf("|----convolution operations time is %f ms,performance is %f GFLOPS\n",convtime,Ops/convtime);
+    Ops = 2*m*out_h*out_w*(lcc*kernel*kernel/1000000.0);
+    cudaDeviceSynchronize();
+    double start = timing();
+    int item;
+    int itemN=1000;
+    for(item=0;item<itemN;item++){
+        convolutional_ongpu(lhh,lww,m,out_h,out_w,lcc,kernel,a,dataP,l.stride,c);
+        cudaDeviceSynchronize();
+    }
+    double convtime = (timing()-start)/itemN;
+    printf("|----convolution operations time is %f ms,performance is %f GFLOPS\n",convtime*itemN,Ops/convtime);
     //cuda_free(dataP);
 
-*/
+
 //}
 
 
