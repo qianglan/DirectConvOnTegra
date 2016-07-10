@@ -118,9 +118,13 @@ void forward_convolutional_layer_gpu(convolutional_layer l, network_state state,
 fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
 
 
+#define Opti1
+
+#ifdef BASE
+
 //if(ln == 1||ln == 3||ln == 5||ln == 6||ln == 7){
 //if(ln == 1){
-/*    int i;
+    int i;
     //int m = l.n;
     int k = l.size*l.size*l.c;
     //int n = convolutional_out_height(l)*convolutional_out_width(l);
@@ -141,7 +145,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
     	cudaDeviceSynchronize();
 		double start = timing();
 		int item;
-	int itemN=1;
+	int itemN=100;
 	    for(item=0;item<itemN;item++)
         	gemm_ongpu(0,0,m,n,k,1.,a,k,b,n,1.,c+i*m*n,n);
         cudaDeviceSynchronize();
@@ -149,9 +153,13 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
         printf("|----convolution operations time is %f ms,performance is %f GFLOPS for %dX%d * %dX%d \n",convtime*itemN,(Ops/convtime), l.n,l.size*l.size*l.c,l.size*l.size*l.c,out_h*out_w);
 	 // printf("absdsdfasdfasdfasdfasf\n");
     }
-*/
+
 //}
 
+#endif
+
+
+#ifdef Opti1
 
 //else{
 ///*
@@ -199,7 +207,7 @@ fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
 
 //}
 
-
+#endif
 
     if(l.batch_normalize){
         if(state.train){

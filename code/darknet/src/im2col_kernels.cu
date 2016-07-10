@@ -5,6 +5,7 @@
 extern "C" {
 #include "im2col.h"
 #include "cuda.h"
+#include "stdio.h"
 }
 
 // src: https://github.com/BVLC/caffe/blob/master/src/caffe/util/im2col.cu
@@ -45,6 +46,9 @@ __global__ void im2col_gpu_kernel(const int n, const float* data_im,
 __global__ void padding_ongpu_kernel(const float* input, const int lcc, const int lhh, const int lww, const int pad, float * dataP){
 
     int ii,jj,kk;
+    int tt=0;
+    for(tt=0;tt<lcc*lhh*lww;tt++)
+	dataP[tt] = 0.0;
     for(ii=0; ii < lcc; ii++)
         for(jj=pad; jj<lhh-pad; jj++)
              for(kk=pad; kk<lww-pad; kk++)
@@ -77,21 +81,84 @@ __global__ void convolutional_ongpu_kernel(const int lhh,const int lww,const int
 ///*
 //opti0
 //int ii,jj,kk,mm,pp,tt;
-int kk,mm,pp,tt;
-int ii = blockIdx.x;
-int jj = threadIdx.x;
+#define  Opt2
+#ifdef BASE
+int mm,pp,tt;
+int ii = threadIdx.x;
+int jj = blockIdx.x;
+int kk = blockIdx.y;
 //int ii = blockIdx.x*blockDim.x+threadIdx.x;
     //for(ii=0; ii<m; ii++)
       // for(jj=0; jj<out_h; jj++)
-           for(kk=0; kk<out_w; kk++) {
+           //for(kk=0; kk<out_w; kk++) {
                 float tempAcc = 0.0;
                     for(mm=0; mm<lcc; mm++)
                         for(pp=0; pp<kernel; pp++)
                             for(tt=0; tt<kernel; tt++)
                                 tempAcc += a[ii*lcc*kernel*kernel+mm*kernel*kernel+pp*kernel+tt]*dataP[mm*lhh*lww+(stride*jj+pp)*lww+stride*kk+tt];
                 c[ii*out_h*out_w+jj*out_w+kk] = tempAcc;
+			//c[kk*out_h*m+jj*m+ii] = tempAcc;
+                //if(ii==0)
+		//	c[ii] = tempAcc;
 				//c[ii*out_h*out_w+jj*out_w+kk] += a[ii*lcc*kernel*kernel+mm*kernel*kernel+pp*kernel+tt]*dataP[mm*lhh*lww+(stride*jj+pp)*lww+stride*kk+tt];
-                        }
+             //           }
+#endif
+
+#ifdef Opt1
+	int mm,pp,tt;
+	int ii = threadIdx.x;
+	int jj = blockIdx.x;
+	int kk = blockIdx.y;
+	float tempAcc = 0.0;
+	for(tt=0;tt<kernel;tt++)
+	    for (pp=0;pp<kernel;pp++)
+		for (mm=0;mm<lcc;mm++)
+		    tempAcc +=a[ii*lcc*kernel*kernel+tt*lcc*kernel+pp*lcc+mm]*dataP[(stride*kk+tt)*lcc*lww+(stride*jj+pp)*lcc+mm];
+	c[kk*out_h*m+jj*m+ii] = tempAcc;
+
+
+#endif
+
+#ifdef Opt2
+
+    __shared__ float ACC[11][32];
+    
+    int ii = blockIdx.x;
+    int jj = blockIdx.y;
+    int kk = blockIdx.z;
+    
+    int mm = threadIdx.x;
+    int pp;// = threadIdx.y;
+    int tt = threadIdx.z;
+    int mms = (lcc==3)?lcc:blockDim.x;
+
+    float tempAcc = 0.0;
+    int CN = (lcc==3)?lcc:lcc/mms;
+
+    int mi;
+    if(mm<mms) {
+        for(pp=0;pp<kernel;pp++)
+            for(mi=0;mi<CN;mi++)
+	        tempAcc +=a[ii*lcc*kernel*kernel+tt*lcc*kernel+pp*lcc+mm*mms+mi]*dataP[(stride*kk+tt)*lcc*lww+(stride*jj+pp)*lcc+mm*mms+mi];
+    }
+
+    ACC[tt][mm] = tempAcc;
+    if(tt==0){
+        int ts=0;
+	for(ts=1;ts<blockDim.z;ts++)
+	    ACC[0][mm] += ACC[ts][mm];
+        for(unsigned int s=mms/2;s>0;s>>=1)
+        {
+	    if(mm<s)
+		ACC[0][mm] += ACC[0][mm+s];
+            __syncthreads();
+        }
+        if(mm==0)
+	c[kk*out_h*m+jj*m+ii] = tempAcc;
+    }
+    
+
+#endif
 //*/
 /*
 //opti1
@@ -145,10 +212,27 @@ void  padding_ongpu(float *input, int lcc, int lhh, int lww, int pad, float *dat
 }
 
 void convolutional_ongpu(int lhh,int lww,int m,int out_h,int out_w,int lcc,int kernel,float *a,float *dataP,int stride,float *c){
-    int blockpergrids = m;
- //int blockpergrids = 1;
-    int threadsperblock = out_h;
+    //int blockpergrids = m;
+    //int threadsperblock = out_h;
+    dim3 blockpergrids(out_h,out_w);
+    dim3 threadsperblock(m);
     cudaDeviceSynchronize();
+    int device;
+    cudaDeviceProp prop;
+    cudaGetDevice(&device);
+    cudaGetDeviceProperties(&prop,device);
+    int numBlocks;
+    int blockSize=m;
+    cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocks,convolutional_ongpu_kernel,blockSize,0);
+    int activeWarps = numBlocks*blockSize/prop.warpSize;
+    int maxWarps = prop.maxThreadsPerMultiProcessor/prop.warpSize;
+    printf("ActiveWarps is %d, maxWarps is %d numBlocks is %d blockSize is%d \n",activeWarps,maxWarps,numBlocks, blockSize);
+
+    int minGridSize;
+    int gridSize;
+    cudaOccupancyMaxPotentialBlockSize(&minGridSize,&blockSize,(void *)convolutional_ongpu_kernel,0,m*out_h*out_w);
+    printf("minGridSize is %d,blockSize is %d \n",minGridSize,blockSize);
+
     convolutional_ongpu_kernel<<<blockpergrids,threadsperblock>>>(lhh,lww,m,out_h,out_w,lcc,kernel,a,dataP,stride,c);
     //cuda_pull_array(float *x_gpu, float *x, int n)
     cudaDeviceSynchronize();
